@@ -1,15 +1,17 @@
-import { Schema } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
-export interface Question {
+export interface QuestionSchema {
   questionText: string
   answer: string
   author: string
 }
 
-const Question = new Schema<Question>({
-  questionText: { type: String, required: true },
-  answer: String,
-  author: { type: String, required: true },
+const questionSchema = new Schema<QuestionSchema>({
+  questionText: { type: String, required: true, trim: true },
+  answer: { type: String, trim: true },
+  author: { type: String, required: true, trim: true },
 })
+
+const Question = mongoose.model('Question', questionSchema)
 
 export default Question
