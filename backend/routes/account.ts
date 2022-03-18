@@ -1,11 +1,17 @@
 import express from 'express'
 import expressAsyncHandler from 'express-async-handler'
+
 import isAuthenticated, {
   isNotAuthenticated,
 } from '../middlewares/isAuthenticated'
 import User from '../models/user'
 
 const AccountRouter = express.Router()
+
+AccountRouter.get('/me', isAuthenticated, (req, res) => {
+  // @ts-ignore
+  res.json({ username: req.session.user })
+})
 
 AccountRouter.post(
   '/signup',
