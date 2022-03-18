@@ -45,6 +45,6 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
 app.use(errorHandler)
 
-app.listen(process.env.BACKEND_PORT, () => {
-  console.log(`Now listening on port ${process.env.BACKEND_PORT}`)
+app.listen(process.env.PORT, () => {
+  console.log(`Now listening on port ${process.env.PORT}`)
 })
