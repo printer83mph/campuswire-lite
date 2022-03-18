@@ -1,57 +1,54 @@
 import express from 'express'
-import mongoose from 'mongoose'
-import isAuthenticated from '../middlewares/isAuthenticated'
+import expressAsyncHandler from 'express-async-handler'
+import isAuthenticated, {
+  isNotAuthenticated,
+} from '../middlewares/isAuthenticated'
 import User from '../models/user'
 
 const AccountRouter = express.Router()
 
-AccountRouter.post('/signup', async (req, res) => {
-  try {
+AccountRouter.post(
+  '/signup',
+  isNotAuthenticated,
+  expressAsyncHandler(async (req, res) => {
     const { username, password } = req.body
     if (await User.exists({ username })) {
-      return res.status(400).json({ message: 'User already exists.' })
+      res.status(400)
+      throw new Error('User already exists.')
     }
-    await User.validate({ username, password })
+    await User.validate({ username, password }).catch(() => {
+      res.status(400)
+      throw new Error('Invalid username/password.')
+    })
     const newUser = new User({ username, password })
     await newUser.save()
     res.status(200).json({ message: 'Account successfully created!' })
-  } catch (err) {
-    if (err instanceof mongoose.Error.ValidationError) {
-      return res.status(400).json('Invalid username/password.')
-    }
-    res.status(500).json({ message: 'Something went wrong.' })
-  }
-})
+  })
+)
 
-AccountRouter.post('/login', async (req, res) => {
-  try {
+AccountRouter.post(
+  '/login',
+  isNotAuthenticated,
+  expressAsyncHandler(async (req, res) => {
     const { username, password } = req.body
-    // @ts-ignore
-    if (req.session.user !== null) {
-      return res.status(401).json({ message: 'Already logged in.' })
-    }
     const user = await User.findOne({ username })
     if (user === null) {
-      return res.status(400).json({ message: 'User not found.' })
+      res.status(400)
+      throw new Error('Username not found.')
     }
     if (user.password !== password) {
-      return res.status(401).json({ message: 'Invalid password.' })
+      res.status(401)
+      throw new Error('Invalid password.')
     }
     // @ts-ignore
     req.session.user = username
-    req.session.save()
     res.status(200).json({ message: 'Successfully logged in!' })
-  } catch (err) {
-    res.status(500).json({ message: 'Something went wrong.' })
-  }
-})
+  })
+)
 
 AccountRouter.post('/logout', isAuthenticated, (req, res) => {
   // @ts-ignore
   req.session.user = null
-  req.session.save()
-  console.log('cleared user.')
-  console.log(req.session)
   res.status(200).json({ message: 'Successfully logged out!' })
 })
 
