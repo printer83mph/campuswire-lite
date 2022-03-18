@@ -2,7 +2,7 @@ module.exports = {
   extends: ['airbnb/base', 'prettier'],
   overrides: [
     {
-      files: ['**/*.tsx'],
+      files: ['**/*.ts', '**/*.tsx'],
       env: {
         browser: true,
         es2021: true,
@@ -15,9 +15,18 @@ module.exports = {
         ecmaVersion: 'latest',
         sourceType: 'module',
         project: './tsconfig.json',
-        __tsconfigRootDir: __dirname,
+        tsconfigRootDir: __dirname,
       },
-      rules: {},
+      rules: {
+        'react/function-component-definition': [
+          'error',
+          {
+            namedComponents: 'arrow-function',
+            unnamedComponents: 'arrow-function',
+          },
+        ],
+        'react/jsx-props-no-spreading': 'off',
+      },
     },
   ],
 }

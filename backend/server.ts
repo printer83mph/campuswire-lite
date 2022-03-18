@@ -8,6 +8,10 @@ import ApiRouter from './routes/api'
 
 const PROD = process.env.NODE_ENV === 'production'
 
+const FRONTEND_ROUTES = ['/', '/login']
+
+const oneDay = 1000 * 60 * 60 * 24
+
 // development vars
 require('dotenv').config()
 
@@ -15,8 +19,6 @@ require('dotenv').config()
 mongoose.connect(process.env.MONGO_URI as string)
 
 const app = express()
-
-const oneDay = 1000 * 60 * 60 * 24
 
 // initialize session
 app.use(
@@ -33,8 +35,13 @@ app.use(
 
 app.use(bodyParser.json())
 
+app.use(express.static('dist'))
+
 app.use('/account', AccountRouter)
 app.use('/api', ApiRouter)
+app.get(FRONTEND_ROUTES, (req, res) => {
+  res.sendFile(`${__dirname}/dist/index.html`)
+})
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (!res.headersSent) {

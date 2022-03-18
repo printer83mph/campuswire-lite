@@ -1,10 +1,18 @@
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import HomePage from './pages/home'
+import LoginPage from './pages/login'
 
 const App = () => {
+  useLayoutEffect(() => {}, [])
+
   return (
-    <div>
-      <h1 className="font-black">Welcome</h1>Hello!
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="login" element={<LoginPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
