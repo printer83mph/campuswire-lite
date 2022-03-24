@@ -13,7 +13,7 @@ ApiRouter.get('/questions', async (req, res, next) => {
 
 ApiRouter.get('/questions/:id', async (req, res, next) => {
   const { id } = req.params
-  const question = await Question.findById({ _id: id })
+  const question = await Question.findById({ _id: id }).catch(next)
   res.status(200).json({ question })
 })
 
