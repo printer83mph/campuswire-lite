@@ -1,32 +1,55 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AuthState } from '../hooks/use-auth'
+import { getQuestions, postQuestion } from '../util/api'
 import { Question } from '../util/types'
 import NewQuestionPanel from './new-question-panel'
 
 export interface NavProps {
-  questions: Question[]
   auth: AuthState
 }
 
 const Nav = (props: NavProps) => {
-  const { questions, auth } = props
-  const [newQ, setNewQ] = useState(false)
-  const [searchParams] = useSearchParams()
+  const { auth } = props
+  const [showNewQ, setShowNewQ] = useState(false)
+  const [questions, setQuestions] = useState<Question[]>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
 
   // @ts-ignore
   const loggedIn = !auth.loading && auth.username !== null
 
+  const getPostsCallback = useCallback(async () => {
+    try {
+      setQuestions((await getQuestions()).data.questions)
+    } catch (err) {
+      alert('Something unexpected went wrong!')
+    }
+  }, [])
+
+  useEffect(() => {
+    getPostsCallback()
+  }, [getPostsCallback])
+
+  const onSubmitNewQuestion = async (questionText: string) => {
+    setShowNewQ(false)
+    const {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      data: { _id },
+    } = await postQuestion(questionText)
+    await getPostsCallback()
+    setSearchParams({ question: _id })
+  }
+
   return (
     <>
-      <nav>
+      <nav className="mr-6">
         {questions ? (
           <div className="flex flex-col w-96">
             {loggedIn ? (
               <button
                 type="button"
-                onClick={() => setNewQ(true)}
-                className="p-3 bg-blue-200 font-semibold"
+                onClick={() => setShowNewQ(true)}
+                className="p-3 bg-blue-500 font-semibold rounded-md text-white mb-3"
               >
                 {loggedIn ? 'New question' : 'Sign in to post a question'}
               </button>
@@ -34,7 +57,7 @@ const Nav = (props: NavProps) => {
               <Link
                 to="/login"
                 replace={false}
-                className="p-3 bg-blue-200 font-semibold"
+                className="p-3 bg-blue-500 font-semibold rounded-md text-white mb-3"
               >
                 Sign in to post a question
               </Link>
@@ -47,8 +70,8 @@ const Nav = (props: NavProps) => {
                   key={_id}
                   to={{ search: `?question=${_id}` }}
                   replace
-                  className={`p-3 font-semibold ${
-                    selected ? 'text-gray-900' : 'text-gray-400'
+                  className={`p-3 font-semibold rounded-md ${
+                    selected ? 'text-gray-900 shadow' : 'text-gray-400'
                   }`}
                 >
                   {questionText}
@@ -60,7 +83,11 @@ const Nav = (props: NavProps) => {
           <div>Loading...</div>
         )}
       </nav>
-      {/* {newQ && <NewQuestionPanel onClose={() => setNewQ(false)} />} */}
+      <NewQuestionPanel
+        open={showNewQ}
+        onClose={() => setShowNewQ(false)}
+        onSubmit={onSubmitNewQuestion}
+      />
     </>
   )
 }

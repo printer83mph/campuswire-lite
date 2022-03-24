@@ -8,7 +8,13 @@ const ApiRouter = express.Router()
 
 ApiRouter.get('/questions', async (req, res, next) => {
   const questions = await Question.find().catch(next)
-  res.json({ questions })
+  res.status(200).json({ questions })
+})
+
+ApiRouter.get('/questions/:id', async (req, res, next) => {
+  const { id } = req.params
+  const question = await Question.findById({ _id: id })
+  res.status(200).json({ question })
 })
 
 ApiRouter.post(

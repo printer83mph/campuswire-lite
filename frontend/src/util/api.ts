@@ -23,5 +23,14 @@ export interface GetQuestionsResponse {
   questions: Question[]
 }
 
+export const getQuestion = (id: string) =>
+  axios.get<{ question: Question }>(`/api/questions/${id}`)
+
 export const getQuestions = () =>
   axios.get<GetQuestionsResponse>('/api/questions')
+
+export const postQuestion = (questionText: string) =>
+  axios.post('/api/questions/add', { questionText })
+
+export const postAnswer = (id: string, answer: string) =>
+  axios.post('/api/questions/answer', { _id: id, answer })

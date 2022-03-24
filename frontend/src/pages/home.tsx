@@ -1,34 +1,21 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback } from 'react'
 
 import Nav from '../components/nav'
+import QuestionView from '../components/question-view'
 import useAuth from '../hooks/use-auth'
-import { getQuestions, logout } from '../util/api'
-import { Question } from '../util/types'
+import { logout } from '../util/api'
 
 const HomePage = () => {
-  const [questions, setQuestions] = useState<Question[]>(null)
   const { auth, fetchAuth } = useAuth()
-
-  const getPostsCallback = useCallback(async () => {
-    try {
-      setQuestions((await getQuestions()).data.questions)
-    } catch (err) {
-      alert('Something unexpected went wrong!')
-    }
-  }, [])
 
   const logoutCallback = useCallback(async () => {
     await logout()
     fetchAuth()
   }, [fetchAuth])
 
-  useEffect(() => {
-    getPostsCallback()
-  }, [getPostsCallback])
-
   return (
     <div className="container mx-auto my-10">
-      <div className="flex flex-row items-center mb-5">
+      <div className="flex flex-row items-center mb-6">
         <h1 className="font-black text-4xl">Campuswire Lite</h1>
         {/* @ts-ignore */}
         {auth.loading || auth.username === null || (
@@ -38,7 +25,7 @@ const HomePage = () => {
             <button
               type="button"
               onClick={logoutCallback}
-              className="px-3 py-2 rounded hover:shadow transition-shadow"
+              className="px-3 py-2 rounded hover:shadow hover:text-black transition-shadow"
             >
               Log out
             </button>
@@ -46,7 +33,8 @@ const HomePage = () => {
         )}
       </div>
       <div className="flex flex-row">
-        <Nav questions={questions} auth={auth} />
+        <Nav auth={auth} />
+        <QuestionView />
       </div>
     </div>
   )
