@@ -34,7 +34,7 @@ const HomePage = () => {
       </div>
       <div className="flex flex-row">
         <Nav auth={auth} />
-        <QuestionView />
+        <QuestionView auth={auth} />
       </div>
     </div>
   )

@@ -1,10 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLocation } from 'react-router-dom'
+import { AuthState } from '../hooks/use-auth'
 import { getQuestion, postAnswer } from '../util/api'
 import { Question } from '../util/types'
 
-const QuestionView = () => {
+export interface QuestionViewProps {
+  auth: AuthState
+}
+
+const QuestionView = ({ auth }: QuestionViewProps) => {
   const [question, setQuestion] = useState<Question>(null)
   const [error, setError] = useState<number | null>(null)
   const { search } = useLocation()
@@ -16,6 +21,7 @@ const QuestionView = () => {
       setError(-2)
       return
     }
+    setQuestion(null)
     try {
       const { data } = await getQuestion(id)
       setQuestion(data.question)
@@ -52,17 +58,20 @@ const QuestionView = () => {
           <h2 className="mb-1">{question.author} asks:</h2>
           <h1 className="text-xl font-bold mb-3">{question.questionText}</h1>
           {question.answer && <p className="mb-4">Answer: {question.answer}</p>}
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <input
-              {...register('answer')}
-              type="text"
-              placeholder="Answer"
-              className="p-2 shadow mr-3 rounded"
-            />
-            <button type="submit" className="bg-gray-200 px-3 py-2 rounded">
-              Post Answer
-            </button>
-          </form>
+          {/* @ts-ignore */}
+          {auth.username && (
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <input
+                {...register('answer')}
+                type="text"
+                placeholder="Answer"
+                className="p-2 shadow mr-3 rounded"
+              />
+              <button type="submit" className="bg-gray-200 px-3 py-2 rounded">
+                Post Answer
+              </button>
+            </form>
+          )}
         </>
       ) : (
         <div>Loading...</div>
