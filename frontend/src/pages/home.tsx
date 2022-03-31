@@ -9,7 +9,7 @@ const HomePage = () => {
   const { auth, fetchAuth } = useAuth()
 
   const logoutCallback = useCallback(async () => {
-    await logout()
+    await logout().catch(() => alert('Failed to logout.'))
     fetchAuth()
   }, [fetchAuth])
 

@@ -39,7 +39,9 @@ const QuestionView = ({ auth }: QuestionViewProps) => {
   const onSubmit = useCallback(
     async ({ answer }: { answer: string }) => {
       // eslint-disable-next-line no-underscore-dangle
-      await postAnswer(question!._id, answer)
+      await postAnswer(question!._id, answer).catch(() =>
+        alert('Failed to post question.')
+      )
       await fetchQuestion()
     },
     [fetchQuestion, question]
