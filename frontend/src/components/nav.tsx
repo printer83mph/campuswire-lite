@@ -18,19 +18,19 @@ const Nav = (props: NavProps) => {
   // @ts-ignore
   const loggedIn = !auth.loading && auth.username !== null
 
-  const getPostsCallback = useCallback(async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       setQuestions((await getQuestions()).data.questions)
     } catch (err) {
-      alert('Something unexpected went wrong!')
+      console.error('Something unexpected went wrong!')
     }
   }, [])
 
   useEffect(() => {
-    getPostsCallback()
-    const inter = setInterval(getPostsCallback, 2000)
+    fetchPosts()
+    const inter = setInterval(fetchPosts, 2000)
     return () => clearInterval(inter)
-  }, [getPostsCallback])
+  }, [fetchPosts])
 
   const onSubmitNewQuestion = async (questionText: string) => {
     setShowNewQ(false)
@@ -38,7 +38,7 @@ const Nav = (props: NavProps) => {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       data: { _id },
     } = await postQuestion(questionText)
-    await getPostsCallback()
+    await fetchPosts()
     setSearchParams({ question: _id })
   }
 
