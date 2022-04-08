@@ -21,20 +21,22 @@ const QuestionView = ({ auth }: QuestionViewProps) => {
       setError(-2)
       return
     }
-    setQuestion(null)
     try {
       const { data } = await getQuestion(id)
       setQuestion(data.question)
       setError(null)
-      reset()
     } catch (e) {
+      setQuestion(null)
       setError(e.response?.status || -1)
     }
-  }, [search, reset])
+  }, [search])
 
   useEffect(() => {
     fetchQuestion()
-  }, [fetchQuestion, search])
+    reset()
+    const inter = setInterval(fetchQuestion, 2000)
+    return () => clearInterval(inter)
+  }, [fetchQuestion, search, reset])
 
   const onSubmit = useCallback(
     async ({ answer }: { answer: string }) => {
@@ -42,9 +44,10 @@ const QuestionView = ({ auth }: QuestionViewProps) => {
       await postAnswer(question!._id, answer).catch(() =>
         alert('Failed to post question.')
       )
+      reset()
       await fetchQuestion()
     },
-    [fetchQuestion, question]
+    [fetchQuestion, question, reset]
   )
 
   return error ? (

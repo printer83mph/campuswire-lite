@@ -28,6 +28,8 @@ const Nav = (props: NavProps) => {
 
   useEffect(() => {
     getPostsCallback()
+    const inter = setInterval(getPostsCallback, 2000)
+    return () => clearInterval(inter)
   }, [getPostsCallback])
 
   const onSubmitNewQuestion = async (questionText: string) => {
